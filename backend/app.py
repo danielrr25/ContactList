@@ -1,30 +1,39 @@
-#TODO: update this file for deployment
-from flask import Flask
-from flask_cors import CORS
+from flask import Flask, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
+import os
 
-# Initialize Flask app
 app = Flask(__name__)
 
-# Enable cross-origin requests
-CORS(app)
+# Enable CORS for development environment
+CORS(app, origins=["http://localhost:3000"])
 
-# Configurations for SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///friends.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# Initialize SQLAlchemy (database ORM)
 db = SQLAlchemy(app)
 
-# Create tables when the app starts
-with app.app_context():
-    db.create_all()
+frontend_folder = os.path.join(os.getcwd(), "..", "frontend")
+dist_folder = os.path.join(frontend_folder, "dist")
 
-# Import routes after app and db initialization to avoid circular imports
+# Serve static files from the "dist" folder under the "frontend" directory
+@app.route("/", defaults={"filename": ""})
+@app.route("/<path:filename>")
+def index(filename):
+    if not filename:
+        filename = "index.html"
+    return send_from_directory(dist_folder, filename)
+
+# Import and register routes
 import routes
 
+
+# Initialize the database
 with app.app_context():
     db.create_all()
 
+# if __name__ == "__main__":
+#     app.run(debug=True)
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
