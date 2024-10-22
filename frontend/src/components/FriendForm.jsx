@@ -25,7 +25,9 @@ const FriendForm = ({ isOpen, onClose }) => {
 
   const handleSubmit = async () => {
     try {
-      await axios.post('http://localhost:5000/api/friends', {
+      // await axios.post('http://localhost:5000/api/friends', {
+        // await axios.post('${BASE_URL}/friends', {
+        await axios.post(`${BASE_URL}/friends`, {
         name,
         role,
         description,
